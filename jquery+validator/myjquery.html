@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <p>Demonstrate fadeIn() with different parameters.</p>
+
+    <button>Click to fade in boxes</button><br><br>
+
+    <div id="div1" style="width:80px;height:80px;background-color:red;"></div><br>
+    <div id="div2" style="width:80px;height:80px;background-color:green;"></div><br>
+    <div id="div3" style="width:80px;height:80px;;background-color:blue;"></div>
+    <script>
+
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     document.getElementById('btn').addEventListener('click',function() {
+        //          alert("Btn clicked");
+        //     });
+        // })
+
+        function MyJquery(selector) {
+          
+            checkSpeed=function(speed){
+                let spd=null;
+                if(speed == null || speed == undefined)
+                spd=2000;
+                else if(speed == "slow" ){
+                    spd=3500
+                }
+                else if(speed == "fast"){
+                    spd=1500
+                }else if(speed == "normal"){
+                    spd=2000
+                }
+                else{
+                    spd=speed;
+                }
+                return spd;
+            }
+            
+            return {
+                _fadeApply:function(whenClearInerval,callback,speed,operation){
+                let interval = setInterval(() => {
+                        let elements = document.querySelectorAll(selector);
+                        this._applyToAllElements(element => {
+                            let opacity = parseFloat(element.style.opacity);
+                            if (opacity == whenClearInerval) {
+                                if(opacity==0){
+                                    element.style.display = "none";
+                                }
+                                clearInterval(interval);
+                                if (callback) {
+                                    callback();
+                                }
+                            }
+                            else {
+                                if(operation=="+"){
+                                    opacity+=.1;
+                                }
+                                else if(operation=="-"){
+                                    opacity-=.1;
+                                }
+                                element.style.opacity = opacity;
+                            }
+                        });
+
+                    },speed / 10);
+            },
+                _applyToAllElements: function (callback) {
+                    let elements = document.querySelectorAll(selector);
+                    for (let element of elements) {
+                        callback(element);
+                    }
+                },
+                click: function (callback) {
+                    this._applyToAllElements(e => e.addEventListener('click', callback));
+                },
+                ready: function (callback) {
+                    if (selector) {
+                        document.addEventListener('DOMContentLoaded', callback);
+                    }
+                },
+                val: function () {
+                    return document.querySelector(selector).value;
+                },
+                text: function () {
+                    return document.querySelector(selector).innerText;
+                },
+                hide: function () {
+                    this._applyToAllElements(e => e.style.display = "none");
+                },
+                show: function () {
+                    this._applyToAllElements(e => e.style.display = "block");
+                },
+                toggle: function () {
+                    this._applyToAllElements(e => {
+                        if (e.style.display == "block" || e.style.display == "") {
+                            e.style.display = "none";
+                        }
+                        else
+                            e.style.display = "block";
+                    });
+                },
+                fadeIn: function (speed, callback) {
+                   let sp= checkSpeed(speed);
+
+                    this._applyToAllElements(element => {
+                        element.style.display = "block";
+                        element.style.opacity = 0;
+                    });
+                    this._fadeApply(1,callback,sp,'+')
+                   
+                },
+
+                fadeOut: function (speed, callback) {
+                   let sp=checkSpeed(speed);
+                    this._applyToAllElements(element => {
+                        element.style.display = "block";
+                        element.style.opacity = 1;
+                    });
+                    this._fadeApply(0,callback,sp,'-')
+                   
+                },
+                fadeToggle: function (speed, callback) {
+                    this._applyToAllElements(e => {
+                        if (e.style.opacity == 0) {
+                            this.fadeIn(this.speed, callback);
+                        }
+                        else {
+                            this.fadeOut(this.speed, callback);
+                        }
+                    });
+                }
+            }
+        }
+
+        let $ = MyJquery;
+
+
+        $(document).ready(function () {
+            $("button").click(function () {
+                $("#div1").fadeOut();
+                $("#div2").fadeOut("slow",);
+                $("#div3").fadeOut(1000);
+            });
+        });
+
+    </script>
+</body>
+
+</html>

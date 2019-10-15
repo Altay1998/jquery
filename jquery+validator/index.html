@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+  <style>
+    form>div>div>span {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <form id="form-to-validate">
+    <div class="form-group">
+      <label>Please enter your name</label>
+      <input type="text" data-validation-error='sp-1' class="required min-len-12 max-len-18" />
+      <div id="sp-1"></div>
+    </div>
+    <div class="form-group">
+      <label>Please enter your age</label>
+      <input type="number" data-validation-error='sp-2' class="required num-min-16 num-max-65" />
+      <div id="sp-2"></div>
+    </div>
+    <div class="form-group">
+      <label>Please enter your email</label>
+      <input type="email" data-validation-error='sp-3' class="required  email" />
+      <div id="sp-3"></div>
+    </div>
+    <button id="validate_button">Validate</button>
+  </form>
+
+  <script>
+
+
+    let validatorConfig =
+    {
+      az: {
+        'num-min-': 'Ədəd `x`-dan boyuk olmalidir',
+        'num-max-': 'Ədəd `x`-dan kiçik olmalidir',
+        'email': 'Email dogru deyil',
+        'required': 'bu bolme mutleq doldurulmalidir'
+      },
+      ru: {
+        'num-min-': 'Nomer ne doljen bit menshe `x`',
+        'num-max-': 'Nomer ne doljen bit bolshe `x`',
+        'email': 'Email neverniy',
+        'required': 'etot polya doljen bit ne pusto'
+      },
+      en: {
+        'num-min-': 'Length cant be less than `x`',
+        'num-max-': 'Length cant be greater than `x`',
+        'email': 'Email is not valid',
+        'required': 'This field is required'
+      }
+    };
+
+    function Validator(validatorConf) {
+      this._validatorConfig = validatorConf;
+      this._lang = 'en';
+      this.configLanguage = function (lang) {
+        this._lang = lang;
+      }
+      this._rules =
+        {
+          _validatorConfig: null,
+          _lang: null,
+          _correntRuleForCheck: null,
+          _formalizeErrorMessage: function (message, val) {
+            if (val != null) {
+              if (message.includes(`x`)) {
+                return message.replace('`x`', val);
+              }
+              else
+                return message;
+            }
+            else
+              return message;
+          },
+          'required': function (val, errorOn) {
+            let const_data = 'required';
+            let message = this._validatorConfig[this._lang][const_data];
+            let errorSpan = document.createElement('span');
+            errorSpan.innerText = message;
+            errorSpan.className = 'error-' + const_data;
+            document.getElementById(errorOn).appendChild(errorSpan);
+          },
+          'email': function (val, errorOn) {
+            let const_data = 'email';
+            let message = this._validatorConfig[this._lang][const_data];
+            let errorSpan = document.createElement('span');
+            errorSpan.innerText = message;
+            errorSpan.className = 'error-' + const_data;
+            document.getElementById(errorOn).appendChild(errorSpan);
+          },
+          'num-min-': function (val, errorOn) {
+            let const_data = 'num-min-';
+            let num = this._correntRuleForCheck.substr(const_data.length, this._correntRuleForCheck.length - const_data.length);
+            if (isNaN(Number.parseInt(val))) {
+              let message = this._formalizeErrorMessage('not a valid number');
+              let errorSpan = document.createElement('span');
+              errorSpan.innerText = message;
+              errorSpan.className = 'error-' + const_data;
+              document.getElementById(errorOn).appendChild(errorSpan);
+            }
+            else
+              if (val < num) {
+                let message = this._formalizeErrorMessage(this._validatorConfig[this._lang][const_data], num);
+                let errorSpan = document.createElement('span');
+                errorSpan.innerText = message;
+                errorSpan.className = 'error-' + const_data;
+                document.getElementById(errorOn).appendChild(errorSpan);
+              }
+          },
+          'num-max-': function (val, errorOn) {
+            let const_data = 'num-max-';
+            let num = this._correntRuleForCheck.substr(const_data.length, this._correntRuleForCheck.length - const_data.length);
+
+            if (isNaN(Number.parseInt(val))) {
+              let message = this._formalizeErrorMessage('not a valid number');
+              let errorSpan = document.createElement('span');
+              errorSpan.innerText = message;
+              errorSpan.className = 'error-' + const_data;
+              document.getElementById(errorOn).appendChild(errorSpan);
+            }
+            else
+              if (val > num) {
+                let message = this._formalizeErrorMessage(this._validatorConfig[this._lang][const_data], num);
+                let errorSpan = document.createElement('span');
+                errorSpan.innerText = message;
+                errorSpan.className = 'error-' + const_data;
+                document.getElementById(errorOn).appendChild(errorSpan);
+              }
+          }
+        },
+        this._validRule = function (rule) {
+          let ruleName = null;
+          for (let f in this._rules) {
+            if (rule.includes(f)) {
+              ruleName = f;
+              break;
+            }
+          }
+          return ruleName;
+        };
+
+      this.validateForm = function (formId) {
+        let formElement = document.getElementById(formId);
+        if (formElement == null) {
+          console.log('bele bir id-li form yoxdur');
+        }
+        else {
+          let inputsToValidate = formElement.getElementsByTagName('input');
+          this._rules._validatorConfig = this._validatorConfig;
+          this._rules._lang = this._lang;
+          for (let f of inputsToValidate) {
+            document.getElementById(f.getAttribute('data-validation-error')).innerHTML = "";
+            let inputClasses = f.classList;
+            if (inputClasses != null) {
+              for (let inputclass of inputClasses) {
+                let ruleName = this._validRule(inputclass);
+                if (ruleName != null) {
+                  this._rules._correntRuleForCheck = inputclass;
+                  this._rules[ruleName](f.value, f.getAttribute('data-validation-error'));
+                }
+              }
+            }
+          }
+        }
+      }
+
+    }
+    let validator = new Validator(validatorConfig);
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('validate_button').addEventListener('click', function (e) {
+        e.preventDefault();
+        validator.configLanguage('az');
+        validator.validateForm('form-to-validate');
+
+      });
+    })
+
+
+
+
+
+  </script>
+</body>
+
+</html>

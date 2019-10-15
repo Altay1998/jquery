@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        span[class*='error-'] {
+            display: block;
+            color: red;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="validatable-form">
+        <div class="form-group">
+            <label>Please enter your name</label>
+            <input type="text" class="required min-len-2 max-len-16" data-validation-error="sp-1">
+            <div id="sp-1"></div>
+        </div>
+        <div class="form-group">
+            <label>Please enter your surname</label>
+            <input type="text" class="required min-len-2 max-len-16" data-validation-error="sp-2">
+            <div id="sp-2"></div>
+        </div>
+        <div class="form-group">
+            <label>Please enter your age</label>
+            <input type="text" class="number required num-min-8 num-max-19" data-validation-error="sp-3">
+            <div id="sp-3"></div>
+        </div>
+        <div class="form-group">
+            <label>Please enter your email</label>
+            <input type="text" class="required email" data-validation-error="sp-4">
+            <div id="sp-4"></div>
+        </div>
+        <button id="btn_validate">Validate</button>
+    </form>
+
+    <script src="js/validator.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+
+            document.getElementById('btn_validate').addEventListener('click', function (e) {
+                e.preventDefault();
+                let lang = 'az';
+
+            //   validator.addValidationConfiguration('az','mx-m-','bir bir test melumatdir');
+
+            //     validator.addValidationRule('mx-m-', (val, err, em, rn) => {
+            //         if (parseInt(val) > parseInt(rn)) {
+            //             let errorSpan = document.createElement('span');
+            //             errorSpan.className = 'error-max-m';
+            //             errorSpan.innerText = em;
+            //             document.getElementById(err).appendChild(errorSpan);
+            //         }
+            //     });
+
+                validator.configLanguage(lang);
+                validator.validateForm('validatable-form');
+
+            });
+
+        })
+
+
+
+    </script>
+</body>
+
+</html>
